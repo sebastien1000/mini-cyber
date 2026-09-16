@@ -1,0 +1,189 @@
+:root {
+  --accent-1: #6366f1;
+  --accent-2: #8b5cf6;
+  --texte: #1f2933;
+  --texte-clair: #6b7280;
+  --fond: #f9fafb;
+}
+
+body {
+  background-color: var(--fond);
+  color: var(--texte);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  max-width: 800px;
+  margin: 60px auto;
+  padding: 0 20px;
+  line-height: 1.6;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.soustitre {
+  color: var(--texte-clair);
+  margin-top: 8px;
+}
+
+h2 {
+  font-size: 1.1rem;
+  color: #3b4a59;
+  margin-top: 28px;
+}
+
+a {
+  color: var(--accent-1);
+  text-decoration: none;
+}
+
+/* La grille de cartes sur la page d'accueil */
+.grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.carte {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 24px 20px;
+  text-align: center;
+  color: var(--texte);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.carte:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
+  border-color: var(--accent-1);
+  text-decoration: none;
+}
+
+.carte-icone {
+  display: block;
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+}
+
+.carte strong {
+  display: block;
+  font-size: 1.05rem;
+  margin-bottom: 6px;
+}
+
+.carte p {
+  color: var(--texte-clair);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Pages de mini apps */
+form {
+  margin: 12px 0;
+}
+
+.options-cases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 12px 0;
+  font-size: 0.9rem;
+  color: var(--texte-clair);
+}
+
+.options-cases label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bouton-secondaire {
+  background: none;
+  color: var(--accent-1);
+  border: 1px solid var(--accent-1);
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bouton-secondaire:hover {
+  background: var(--accent-1);
+  color: #ffffff;
+  opacity: 1;
+}
+
+.liste-criteres {
+  list-style: none;
+  padding: 0;
+  font-size: 0.9rem;
+}
+
+.alerte-danger {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-weight: 600;
+}
+
+.critere-ok {
+  color: #16a34a;
+}
+
+.critere-manquant {
+  color: #dc2626;
+}
+
+input[type="text"] {
+  background-color: #ffffff;
+  color: var(--texte);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: inherit;
+  width: 250px;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: var(--accent-1);
+}
+
+button {
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: opacity 0.15s ease;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+strong {
+  color: #111827;
+}

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Mots de passe</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <p><a href="/">&larr; Retour à l'accueil</a></p>
+
+  <h1>🔑 Mots de passe</h1>
+
+  <h2>Générer un mot de passe</h2>
+  <form method="post">
+    <div class="options-cases">
+      <label><input type="radio" name="mode" value="aleatoire" {% if mode_choisi == "aleatoire" %}checked{% endif %}> Aléatoire (caractères)</label>
+      <label><input type="radio" name="mode" value="memorisable" {% if mode_choisi == "memorisable" %}checked{% endif %}> Mémorisable (mots)</label>
+    </div>
+
+    <label>Longueur :
+      <input type="number" name="longueur" min="4" max="64" value="{{ longueur_choisie }}">
+    </label>
+
+    <div class="options-cases">
+      <label><input type="checkbox" name="types" value="min" {% if "min" in types_choisis %}checked{% endif %}> minuscules</label>
+      <label><input type="checkbox" name="types" value="maj" {% if "maj" in types_choisis %}checked{% endif %}> MAJUSCULES</label>
+      <label><input type="checkbox" name="types" value="chiffres" {% if "chiffres" in types_choisis %}checked{% endif %}> chiffres</label>
+      <label><input type="checkbox" name="types" value="symboles" {% if "symboles" in types_choisis %}checked{% endif %}> symboles (!@#...)</label>
+    </div>
+
+    <button type="submit" name="action" value="generer">Générer</button>
+  </form>
+
+  {% if mot_de_passe %}
+    <p>
+      Ton mot de passe : <strong id="mot-de-passe-genere">{{ mot_de_passe }}</strong>
+      <button type="button" class="bouton-secondaire bouton-copier" data-cible="mot-de-passe-genere">Copier</button>
+    </p>
+  {% endif %}
+
+  <h2>Vérifier un mot de passe</h2>
+  <form method="post">
+    <input type="text" id="champ-mot-de-passe-teste" name="mot_de_passe_teste" placeholder="Tape un mot de passe" value="{{ mot_de_passe_teste or '' }}">
+    <button type="submit" name="action" value="verifier">Vérifier</button>
+    <button type="button" class="bouton-secondaire" id="bouton-effacer">Supprimer</button>
+  </form>
+
+  <div id="resultat-verification">
+    {% if analyse %}
+      {% if analyse.mot_de_passe_courant %}
+        <div class="alerte-danger">
+          ⚠️ Ce mot de passe fait partie des plus utilisés au monde ! Change-le, même s'il te semble complexe.
+        </div>
+      {% endif %}
+
+      <p>Robustesse : <strong>{{ analyse.niveau }}</strong></p>
+
+      {% if proposition %}
+        <p>
+          Proposition plus robuste : <strong id="proposition-mdp">{{ proposition }}</strong>
+          <button type="button" class="bouton-secondaire bouton-copier" data-cible="proposition-mdp">Copier</button>
+        </p>
+      {% endif %}
+
+      <ul class="liste-criteres">
+        {% for critere in analyse.criteres %}
+          <li class="{{ 'critere-ok' if critere.ok else 'critere-manquant' }}">
+            {{ "✓" if critere.ok else "✗" }} {{ critere.label }}
+          </li>
+        {% endfor %}
+      </ul>
+
+      {% if analyse.conseils %}
+        <p><strong>Pour l'améliorer :</strong></p>
+        <ul>
+          {% for conseil in analyse.conseils %}
+            <li>{{ conseil }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>Rien à ajouter, ce mot de passe est excellent !</p>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

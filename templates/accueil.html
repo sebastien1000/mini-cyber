@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Mon projet Cyber</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>Mon projet Cyber</h1>
+    <p class="soustitre">Une boîte à outils de mini apps cyber</p>
+  </header>
+
+  {% if apps %}
+    <div class="grille">
+      {% for id, info in apps.items() %}
+        <a class="carte" href="/{{ id }}">
+          <span class="carte-icone">{{ info.icone }}</span>
+          <strong>{{ info.nom }}</strong>
+          <p>{{ info.description }}</p>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>Aucune mini app pour l'instant. Ajoute un fichier dans mini_apps/ !</p>
+  {% endif %}
+</body>
+</html>
