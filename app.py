@@ -38,7 +38,12 @@ def mots_de_passe():
             if mode_choisi == "memorisable":
                 mot_de_passe = generer_memorisable()
             else:
-                longueur_choisie = max(4, min(64, int(request.form.get("longueur", 16))))
+                try:
+                    longueur_choisie = int(request.form.get("longueur", 16))
+                except ValueError:
+                    longueur_choisie = 16
+                longueur_choisie = max(4, min(64, longueur_choisie))
+
                 types_choisis = request.form.getlist("types")
                 mot_de_passe = generer(longueur=longueur_choisie, types=types_choisis)
         elif action == "verifier":
