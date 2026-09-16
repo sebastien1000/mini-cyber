@@ -53,7 +53,7 @@ def mots_de_passe():
                 proposition = proposer_amelioration(mot_de_passe_teste)
 
     return render_template(
-        "mots_de_passe.html",
+        "mots_de_passe/mots_de_passe.html",
         mot_de_passe=mot_de_passe,
         mot_de_passe_teste=mot_de_passe_teste,
         analyse=analyse,
