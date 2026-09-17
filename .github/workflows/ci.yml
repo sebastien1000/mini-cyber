@@ -25,4 +25,4 @@ jobs:
           ruff format --check .
 
       - name: Lancer les tests
-        run: pytest
+        run: python -m pytest
