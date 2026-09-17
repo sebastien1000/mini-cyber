@@ -1,6 +1,7 @@
 """
 Mini app : Mots de passe.
 """
+
 import secrets
 import string
 
@@ -42,6 +43,7 @@ def generer(longueur=16, types=None):
 
 
 # Une petite liste de mots simples, pour le mode "mémorisable"
+# fmt: off
 MOTS_SIMPLES = [
     "cheval", "tigre", "lampe", "montagne", "riviere", "nuage", "soleil", "lune",
     "etoile", "foret", "rocher", "sable", "vague", "orage", "vent", "feuille",
@@ -59,6 +61,7 @@ MOTS_SIMPLES = [
     "velo", "route", "vallee", "plaine", "desert", "ocean", "lac", "ile",
     "village", "marche", "ecole", "musee", "theatre", "cinema", "stade",
 ]
+# fmt: on
 
 
 def generer_memorisable(nombre_mots=4):
@@ -94,6 +97,7 @@ def proposer_amelioration(mot_de_passe):
 
 # Les mots de passe les plus utilisés au monde : les premiers essayés par les pirates.
 # On utilise un set (et pas une liste) car la recherche "est-ce que X est dedans ?" y est plus rapide.
+# fmt: off
 MOTS_DE_PASSE_COURANTS = {
     "123456", "123456789", "12345678", "12345", "1234567", "1234", "111111",
     "000000", "123123", "abc123", "qazwsx", "1q2w3e4r",
@@ -103,6 +107,7 @@ MOTS_DE_PASSE_COURANTS = {
     "azerty", "azerty123", "qwerty", "qwerty123", "motdepasse", "bienvenue",
     "soleil", "bonjour", "chocolat", "marseille", "france",
 }
+# fmt: on
 
 
 def _normaliser(texte):
@@ -111,9 +116,7 @@ def _normaliser(texte):
 
 
 # On précalcule les versions "nettoyées" de la liste, une seule fois au démarrage
-_MOTS_DE_PASSE_COURANTS_NORMALISES = {
-    _normaliser(mdp) for mdp in MOTS_DE_PASSE_COURANTS if _normaliser(mdp)
-}
+_MOTS_DE_PASSE_COURANTS_NORMALISES = {_normaliser(mdp) for mdp in MOTS_DE_PASSE_COURANTS if _normaliser(mdp)}
 
 
 def analyser(mot_de_passe):
@@ -175,11 +178,16 @@ def analyser(mot_de_passe):
     est_variante_courante = bool(mdp_normalise) and mdp_normalise in _MOTS_DE_PASSE_COURANTS_NORMALISES
     est_trop_previsible = est_courant or est_variante_courante
 
-    criteres.append({
-        "label": "N'est pas un mot de passe trop courant (ni une variante)",
-        "ok": not est_trop_previsible,
-        "conseil": "Ce mot de passe fait partie des plus utilisés au monde (ou en est une variante proche) : change-le, même s'il te semble complexe.",
-    })
+    criteres.append(
+        {
+            "label": "N'est pas un mot de passe trop courant (ni une variante)",
+            "ok": not est_trop_previsible,
+            "conseil": (
+                "Ce mot de passe fait partie des plus utilisés au monde (ou en est une "
+                "variante proche) : change-le, même s'il te semble complexe."
+            ),
+        }
+    )
 
     if est_trop_previsible:
         niveau = "faible"

@@ -6,7 +6,8 @@ pytest les lance toutes et affiche celles qui échouent.
 
 Pour les lancer : ./venv/bin/python -m pytest
 """
-from mini_apps.mots_de_passe import generer, generer_memorisable, analyser
+
+from mini_apps.mots_de_passe import analyser, generer, generer_memorisable
 
 
 def test_generer_respecte_la_longueur():

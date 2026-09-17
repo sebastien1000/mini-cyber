@@ -4,6 +4,7 @@ Les pages web (routes Flask) de la mini app "Mots de passe".
 Séparé de __init__.py : ce fichier s'occupe du web (formulaires, HTML),
 __init__.py s'occupe de la logique pure (générer, analyser...).
 """
+
 from flask import Blueprint, render_template, request
 
 from . import analyser, generer, generer_memorisable, proposer_amelioration

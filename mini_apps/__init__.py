@@ -8,6 +8,7 @@ et pour chacun :
 
 On ne touchera JAMAIS ce fichier pour ajouter une mini app.
 """
+
 import importlib
 import importlib.util
 import pkgutil
