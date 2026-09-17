@@ -5,6 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
+# Install runtime + dev dependencies (Flask, python-dotenv, pytest, ruff)
+./venv/bin/pip install -r requirements-dev.txt
+
 # Run the app (http://127.0.0.1:5000)
 ./venv/bin/python app.py
 
@@ -14,9 +17,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Run a single test file / test
 ./venv/bin/python -m pytest tests/mots_de_passe/test_mots_de_passe.py
 ./venv/bin/python -m pytest tests/mots_de_passe/test_mots_de_passe.py::test_generer_respecte_la_longueur
+
+# Lint and format (config in pyproject.toml)
+./venv/bin/ruff check .
+./venv/bin/ruff format .
 ```
 
-There is no lint/format tooling configured in this repo.
+CI (`.github/workflows/ci.yml`) runs `ruff check`, `ruff format --check`, and `pytest` on every push/PR to `main`.
+
+Config (debug mode, secret key) is read from environment variables via `python-dotenv` (see `.env.example`); `app.py` calls `load_dotenv()` before reading `FLASK_DEBUG` / `SECRET_KEY`.
+
+`MOTS_SIMPLES` and `MOTS_DE_PASSE_COURANTS` in `mini_apps/mots_de_passe/__init__.py` are wrapped in `# fmt: off` / `# fmt: on` to keep them as dense wordlists — ruff format would otherwise explode them to one item per line. Keep that pattern for any other long literal lists.
 
 ## Architecture
 

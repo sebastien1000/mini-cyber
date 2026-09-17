@@ -1,14 +1,22 @@
 # Mon projet Cyber
 
+[![CI](https://github.com/sebastien1000/mini-cyber/actions/workflows/ci.yml/badge.svg)](https://github.com/sebastien1000/mini-cyber/actions/workflows/ci.yml)
+
 Une petite boîte à outils web, en Flask, réunissant plusieurs "mini apps" autour de la cybersécurité.
 
-## Lancer le projet
+## Installation
 
 ```bash
 python -m venv venv
 source venv/bin/activate
-pip install flask
-python app.py
+pip install -r requirements-dev.txt   # inclut Flask + les outils de dev (pytest, ruff)
+cp .env.example .env                  # config locale (voir .env.example)
+```
+
+## Lancer le projet
+
+```bash
+./venv/bin/python app.py
 ```
 
 Puis ouvre http://127.0.0.1:5000 dans ton navigateur.
@@ -18,6 +26,21 @@ Puis ouvre http://127.0.0.1:5000 dans ton navigateur.
 ```bash
 ./venv/bin/python -m pytest
 ```
+
+## Vérifier le style du code
+
+Le projet utilise [ruff](https://docs.astral.sh/ruff/) pour le linting et le formatage.
+
+```bash
+./venv/bin/ruff check .           # détecte les erreurs et le code suspect
+./venv/bin/ruff format .          # reformate le code automatiquement
+```
+
+Ces vérifications (+ les tests) tournent aussi automatiquement sur GitHub Actions à chaque push (voir `.github/workflows/ci.yml`).
+
+## Configuration
+
+La config (mode debug, clé secrète) se fait via des variables d'environnement, lues depuis un fichier `.env` local (non commité, voir `.env.example` pour les valeurs possibles).
 
 ## Mini apps disponibles
 
