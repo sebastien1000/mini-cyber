@@ -4,6 +4,7 @@ Mini app : Détecteur de phishing.
 
 import ipaddress
 import re
+import unicodedata
 from urllib.parse import urlsplit
 
 INFO = {
@@ -97,6 +98,23 @@ SALUTATIONS_GENERIQUES = [
 EXTENSIONS_DANGEREUSES = [".exe", ".scr", ".js", ".vbs", ".bat", ".jar", ".msi", ".zip"]
 
 
+def _normaliser_texte(texte):
+    """Minuscules et sans accents : 'Immédiatement' et 'immediatement' deviennent identiques.
+
+    Beaucoup de SMS/emails sont tapés vite, sans accents : sans cette étape, un mot-clé
+    comme 'immédiatement' ne détecterait pas 'immediatement'.
+    """
+    texte = texte.lower()
+    texte_decompose = unicodedata.normalize("NFKD", texte)
+    return "".join(c for c in texte_decompose if not unicodedata.combining(c))
+
+
+# On précalcule les versions "sans accents" des mots-clés, une seule fois au démarrage
+_MOTS_URGENCE_NORMALISES = [_normaliser_texte(mot) for mot in MOTS_URGENCE]
+_MOTS_DONNEES_SENSIBLES_NORMALISES = [_normaliser_texte(mot) for mot in MOTS_DONNEES_SENSIBLES]
+_SALUTATIONS_GENERIQUES_NORMALISEES = [_normaliser_texte(mot) for mot in SALUTATIONS_GENERIQUES]
+
+
 def extraire_urls(texte):
     """Renvoie la liste des liens trouvés dans un texte."""
     return _URL_REGEX.findall(texte or "")
@@ -140,7 +158,7 @@ def analyser(texte):
     - urls_trouvees : les liens repérés dans le texte
     """
     texte = texte or ""
-    texte_minuscule = texte.lower()
+    texte_normalise = _normaliser_texte(texte)
     urls = extraire_urls(texte)
     hotes = [_hote(url) for url in urls]
 
@@ -190,7 +208,7 @@ def analyser(texte):
         },
         {
             "label": "Pas de sentiment d'urgence excessif",
-            "ok": not _contient_un_mot(texte_minuscule, MOTS_URGENCE),
+            "ok": not _contient_un_mot(texte_normalise, _MOTS_URGENCE_NORMALISES),
             "conseil": (
                 "Créer un sentiment d'urgence ('agis maintenant', 'compte bloqué'...) "
                 "est une technique classique pour empêcher de réfléchir."
@@ -198,17 +216,17 @@ def analyser(texte):
         },
         {
             "label": "Ne demande pas d'informations sensibles",
-            "ok": not _contient_un_mot(texte_minuscule, MOTS_DONNEES_SENSIBLES),
+            "ok": not _contient_un_mot(texte_normalise, _MOTS_DONNEES_SENSIBLES_NORMALISES),
             "conseil": "Une organisation sérieuse ne demande jamais un mot de passe ou un code de carte par email/SMS.",
         },
         {
             "label": "Salutation personnalisée (pas générique)",
-            "ok": not _contient_un_mot(texte_minuscule, SALUTATIONS_GENERIQUES),
+            "ok": not _contient_un_mot(texte_normalise, _SALUTATIONS_GENERIQUES_NORMALISEES),
             "conseil": "'Cher client' à la place de ton prénom peut indiquer un envoi de masse frauduleux.",
         },
         {
             "label": "Pas de pièce jointe à un format à risque",
-            "ok": not _contient_un_mot(texte_minuscule, EXTENSIONS_DANGEREUSES),
+            "ok": not _contient_un_mot(texte_normalise, EXTENSIONS_DANGEREUSES),
             "conseil": (
                 "Les formats .exe, .js, .zip, .scr... peuvent contenir des virus : "
                 "ne les ouvre jamais sans certitude sur leur origine."

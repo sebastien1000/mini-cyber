@@ -72,6 +72,18 @@ def test_detecte_urgence_et_donnees_sensibles():
     assert "Salutation personnalisée (pas générique)" in labels_en_echec
 
 
+def test_detecte_urgence_et_donnees_sensibles_sans_accents():
+    # Beaucoup de SMS sont tapés vite, sans accents : les mots-clés doivent quand
+    # même être détectés (ex: "immediatement" doit matcher "immédiatement").
+    resultat = analyser(
+        "Cher client, votre compte sera suspendu sous 24h. Merci de confirmer votre mot de passe immediatement."
+    )
+    labels_en_echec = [s["label"] for s in resultat["signaux"] if not s["ok"]]
+    assert "Pas de sentiment d'urgence excessif" in labels_en_echec
+    assert "Ne demande pas d'informations sensibles" in labels_en_echec
+    assert "Salutation personnalisée (pas générique)" in labels_en_echec
+
+
 def test_message_avec_plusieurs_signaux_est_dangereux():
     resultat = analyser(
         "Cher client, votre compte sera bloqué sous 24h. "
