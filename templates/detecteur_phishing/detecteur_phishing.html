@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Détecteur de phishing</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='detecteur_phishing/style.css') }}">
+</head>
+<body>
+  <p><a href="/">&larr; Retour à l'accueil</a></p>
+
+  <h1>🎣 Détecteur de phishing</h1>
+  <p>Colle le texte d'un email ou d'un SMS suspect (avec ses liens) pour repérer les signaux classiques d'arnaque.</p>
+
+  <form method="post">
+    <textarea name="texte" rows="8" placeholder="Colle ici le message suspect...">{{ texte }}</textarea>
+    <button type="submit">Analyser</button>
+  </form>
+
+  {% if resultat %}
+    <div id="resultat-analyse">
+      <div class="alerte-{{ 'danger' if resultat.niveau == 'dangereux' else ('attention' if resultat.niveau == 'suspect' else 'ok') }}">
+        {% if resultat.niveau == "dangereux" %}
+          ⚠️ Ce message présente plusieurs signaux de phishing : ne clique sur aucun lien et ne réponds pas.
+        {% elif resultat.niveau == "suspect" %}
+          🟠 Ce message présente au moins un signal suspect : reste prudent.
+        {% else %}
+          ✅ Aucun signal de phishing détecté dans ce message.
+        {% endif %}
+      </div>
+
+      <p>Niveau de risque : <strong>{{ resultat.niveau }}</strong> ({{ resultat.nombre_signaux }} signal(aux) détecté(s))</p>
+
+      {% if resultat.urls_trouvees %}
+        <p><strong>Liens repérés dans le texte :</strong></p>
+        <ul>
+          {% for url in resultat.urls_trouvees %}
+            <li><code>{{ url }}</code></li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <ul class="liste-criteres">
+        {% for signal in resultat.signaux %}
+          <li class="{{ 'critere-ok' if signal.ok else 'critere-manquant' }}">
+            {{ "✓" if signal.ok else "✗" }} {{ signal.label }}
+          </li>
+        {% endfor %}
+      </ul>
+
+      {% if resultat.conseils %}
+        <p><strong>Pourquoi se méfier :</strong></p>
+        <ul>
+          {% for conseil in resultat.conseils %}
+            <li>{{ conseil }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  {% endif %}
+</body>
+</html>

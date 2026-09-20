@@ -1,0 +1,63 @@
+/* Styles spécifiques à la mini app "Détecteur de phishing" uniquement.
+   Le thème général (couleurs, boutons...) est dans static/style.css,
+   partagé par tout le site. */
+
+textarea {
+  display: block;
+  background-color: #ffffff;
+  color: var(--texte);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: inherit;
+  width: 100%;
+  max-width: 600px;
+  resize: vertical;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--accent-1);
+}
+
+.liste-criteres {
+  list-style: none;
+  padding: 0;
+  font-size: 0.9rem;
+}
+
+.critere-ok {
+  color: #16a34a;
+}
+
+.critere-manquant {
+  color: #dc2626;
+}
+
+.alerte-danger,
+.alerte-attention,
+.alerte-ok {
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-weight: 600;
+  border: 1px solid;
+}
+
+.alerte-danger {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.alerte-attention {
+  background-color: #fffbeb;
+  border-color: #fde68a;
+  color: #b45309;
+}
+
+.alerte-ok {
+  background-color: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #15803d;
+}
