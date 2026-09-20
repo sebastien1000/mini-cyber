@@ -20,6 +20,31 @@ textarea:focus {
   border-color: var(--accent-1);
 }
 
+.options-cases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.bouton-secondaire {
+  background: none;
+  color: var(--accent-1);
+  border: 1px solid var(--accent-1);
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bouton-secondaire:hover {
+  background: var(--accent-1);
+  color: #ffffff;
+  opacity: 1;
+}
+
 .liste-criteres {
   list-style: none;
   padding: 0;

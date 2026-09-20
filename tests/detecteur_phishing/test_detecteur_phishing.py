@@ -7,7 +7,7 @@ pytest les lance toutes et affiche celles qui échouent.
 Pour les lancer : ./venv/bin/python -m pytest
 """
 
-from mini_apps.detecteur_phishing import analyser, extraire_urls
+from mini_apps.detecteur_phishing import analyser, analyser_url, extraire_urls
 
 
 def test_message_sans_signal_est_sur():
@@ -60,6 +60,32 @@ def test_sous_domaine_legitime_nest_pas_signale():
     resultat = analyser("Va sur https://www.paypal.com/login pour te connecter.")
     labels_en_echec = [s["label"] for s in resultat["signaux"] if not s["ok"]]
     assert "Aucun lien n'imite le nom d'une marque connue" not in labels_en_echec
+
+
+def test_detecte_une_faute_de_frappe_dans_une_marque():
+    # "paypa1.com" (le chiffre 1 à la place du l) n'est pas une simple sous-chaîne
+    # de "paypal" : il faut la comparaison approximative pour l'attraper.
+    resultat = analyser("Connecte-toi sur http://paypa1.com/verif")
+    labels_en_echec = [s["label"] for s in resultat["signaux"] if not s["ok"]]
+    assert "Aucun lien n'imite le nom d'une marque connue" in labels_en_echec
+
+
+def test_domaine_ordinaire_nest_pas_signale_comme_marque():
+    resultat = analyser("Va sur https://www.wikipedia.org/wiki/Phishing pour en savoir plus.")
+    labels_en_echec = [s["label"] for s in resultat["signaux"] if not s["ok"]]
+    assert "Aucun lien n'imite le nom d'une marque connue" not in labels_en_echec
+
+
+def test_analyser_url_ne_verifie_que_les_signaux_de_lien():
+    resultat = analyser_url("http://192.168.1.1/login")
+    assert len(resultat["signaux"]) == 5
+    labels_en_echec = [s["label"] for s in resultat["signaux"] if not s["ok"]]
+    assert "Aucun lien ne pointe vers une adresse IP" in labels_en_echec
+
+
+def test_analyser_verifie_les_9_signaux():
+    resultat = analyser("Un message quelconque, sans lien.")
+    assert len(resultat["signaux"]) == 9
 
 
 def test_detecte_urgence_et_donnees_sensibles():

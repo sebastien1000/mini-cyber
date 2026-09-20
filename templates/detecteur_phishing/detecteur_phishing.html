@@ -13,12 +13,20 @@
   <p>Colle le texte d'un email ou d'un SMS suspect (avec ses liens) pour repérer les signaux classiques d'arnaque.</p>
 
   <form method="post">
-    <textarea name="texte" rows="8" placeholder="Colle ici le message suspect...">{{ texte }}</textarea>
+    <textarea id="zone-texte" name="texte" rows="8" placeholder="Colle ici le message suspect (ou juste un lien)...">{{ texte }}</textarea>
+    <div class="options-cases">
+      <button type="button" class="bouton-secondaire" data-exemple="piege">Exemple piégé</button>
+      <button type="button" class="bouton-secondaire" data-exemple="sur">Exemple normal</button>
+    </div>
     <button type="submit">Analyser</button>
   </form>
 
   {% if resultat %}
     <div id="resultat-analyse">
+      {% if mode_lien_seul %}
+        <p>🔗 <strong>Mode lien seul</strong> : seuls les signaux propres au lien sont vérifiés (pas le ton du message, absent ici).</p>
+      {% endif %}
+
       <div class="alerte-{{ 'danger' if resultat.niveau == 'dangereux' else ('attention' if resultat.niveau == 'suspect' else 'ok') }}">
         {% if resultat.niveau == "dangereux" %}
           ⚠️ Ce message présente plusieurs signaux de phishing : ne clique sur aucun lien et ne réponds pas.
@@ -58,5 +66,7 @@
       {% endif %}
     </div>
   {% endif %}
+
+  <script src="{{ url_for('static', filename='detecteur_phishing/script.js') }}"></script>
 </body>
 </html>

@@ -134,12 +134,42 @@ def _est_adresse_ip(hote):
         return False
 
 
+def _distance_levenshtein(a, b):
+    """Nombre minimal de lettres à ajouter/enlever/changer pour passer de a à b."""
+    longueur_b = len(b)
+    ligne_precedente = list(range(longueur_b + 1))
+
+    for i, lettre_a in enumerate(a, start=1):
+        ligne_courante = [i] + [0] * longueur_b
+        for j, lettre_b in enumerate(b, start=1):
+            cout_substitution = 0 if lettre_a == lettre_b else 1
+            ligne_courante[j] = min(
+                ligne_precedente[j] + 1,  # suppression
+                ligne_courante[j - 1] + 1,  # insertion
+                ligne_precedente[j - 1] + cout_substitution,  # substitution
+            )
+        ligne_precedente = ligne_courante
+
+    return ligne_precedente[longueur_b]
+
+
+def _ressemble_a_une_marque(morceau, marque):
+    """Vrai si un morceau du domaine contient la marque, ou une faute de frappe très proche
+    (ex: 'paypa1', 'paypall' pour 'paypal'). Les marques trop courtes (ex: 'free') sont
+    exclues de la comparaison approximative pour éviter de signaler des mots ordinaires."""
+    if marque in morceau:
+        return True
+    return len(marque) >= 5 and _distance_levenshtein(morceau, marque) <= 1
+
+
 def _imite_une_marque(hote):
-    """Vrai si l'hôte contient le nom d'une marque connue sans être (un sous-domaine de) son vrai domaine."""
+    """Vrai si l'hôte imite le nom d'une marque connue sans être (un sous-domaine de) son vrai domaine."""
     if not hote:
         return False
     for marque, domaine_officiel in MARQUES_CONNUES.items():
-        if marque in hote and hote != domaine_officiel and not hote.endswith("." + domaine_officiel):
+        if hote == domaine_officiel or hote.endswith("." + domaine_officiel):
+            continue  # c'est le vrai domaine (ou un de ses sous-domaines) : rien à signaler
+        if any(_ressemble_a_une_marque(morceau, marque) for morceau in hote.split(".")):
             return True
     return False
 
@@ -148,18 +178,8 @@ def _contient_un_mot(texte_minuscule, mots):
     return any(mot in texte_minuscule for mot in mots)
 
 
-def analyser(texte):
-    """Analyse un texte (email, SMS...) et repère les signaux classiques de phishing.
-
-    Retourne un dictionnaire avec :
-    - niveau : 'sûr', 'suspect' ou 'dangereux'
-    - signaux : la liste des critères testés (respecté ou non)
-    - conseils : les explications des signaux détectés
-    - urls_trouvees : les liens repérés dans le texte
-    """
-    texte = texte or ""
-    texte_normalise = _normaliser_texte(texte)
-    urls = extraire_urls(texte)
+def _signaux_liens(urls):
+    """Les 5 signaux propres aux liens trouvés (utilisables seuls, sans texte de message autour)."""
     hotes = [_hote(url) for url in urls]
 
     url_ip = any(_est_adresse_ip(hote) for hote in hotes)
@@ -168,7 +188,7 @@ def analyser(texte):
     url_sans_https = any(url.lower().startswith("http://") for url in urls)
     url_imite_marque = any(_imite_une_marque(hote) for hote in hotes)
 
-    signaux = [
+    return [
         {
             "label": "Aucun lien ne pointe vers une adresse IP",
             "ok": not url_ip,
@@ -202,10 +222,17 @@ def analyser(texte):
             "label": "Aucun lien n'imite le nom d'une marque connue",
             "ok": not url_imite_marque,
             "conseil": (
-                "Un domaine comme paypal-securite-login.com n'est PAS le vrai site PayPal : "
-                "seul paypal.com (ou un de ses sous-domaines) l'est."
+                "Un domaine comme paypal-securite-login.com (ou une faute de frappe comme "
+                "paypa1.com) n'est PAS le vrai site PayPal : seul paypal.com (ou un de ses "
+                "sous-domaines) l'est."
             ),
         },
+    ]
+
+
+def _signaux_texte(texte_normalise):
+    """Les 4 signaux propres au contenu d'un message (urgence, ton, pièces jointes...)."""
+    return [
         {
             "label": "Pas de sentiment d'urgence excessif",
             "ok": not _contient_un_mot(texte_normalise, _MOTS_URGENCE_NORMALISES),
@@ -234,6 +261,8 @@ def analyser(texte):
         },
     ]
 
+
+def _construire_resultat(signaux, urls):
     nombre_signaux = sum(1 for signal in signaux if not signal["ok"])
 
     if nombre_signaux == 0:
@@ -252,3 +281,26 @@ def analyser(texte):
         "urls_trouvees": urls,
         "nombre_signaux": nombre_signaux,
     }
+
+
+def analyser(texte):
+    """Analyse un texte (email, SMS...) et repère les signaux classiques de phishing.
+
+    Retourne un dictionnaire avec :
+    - niveau : 'sûr', 'suspect' ou 'dangereux'
+    - signaux : la liste des critères testés (respecté ou non)
+    - conseils : les explications des signaux détectés
+    - urls_trouvees : les liens repérés dans le texte
+    """
+    texte = texte or ""
+    urls = extraire_urls(texte)
+    signaux = _signaux_liens(urls) + _signaux_texte(_normaliser_texte(texte))
+    return _construire_resultat(signaux, urls)
+
+
+def analyser_url(url):
+    """Analyse un lien seul (sans texte de message autour) : ne vérifie que les 5 signaux
+    propres aux liens (pas l'urgence, la salutation... qui n'ont pas de sens pour un lien seul)."""
+    urls = extraire_urls(url or "")
+    signaux = _signaux_liens(urls)
+    return _construire_resultat(signaux, urls)
