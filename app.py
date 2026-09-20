@@ -18,8 +18,17 @@ from mini_apps import charger_mini_apps, enregistrer_routes
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "dev")
+SECRET_KEY = os.environ.get("SECRET_KEY", "dev")
 DEBUG = os.environ.get("FLASK_DEBUG", "true").lower() == "true"
+
+if not DEBUG and SECRET_KEY == "dev":
+    raise RuntimeError(
+        "SECRET_KEY vaut encore 'dev' alors que FLASK_DEBUG=false. "
+        "Définis une vraie clé dans .env (voir .env.example) avant de lancer "
+        "l'app hors mode debug."
+    )
+
+app.secret_key = SECRET_KEY
 
 # On charge la liste des mini apps, puis on branche leurs routes
 MINI_APPS = charger_mini_apps()
