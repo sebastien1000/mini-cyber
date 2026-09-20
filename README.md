@@ -45,6 +45,7 @@ La config (mode debug, clé secrète) se fait via des variables d'environnement,
 ## Mini apps disponibles
 
 - 🔑 **Mots de passe** (`/mots_de_passe`) : générer un mot de passe solide (aléatoire ou mémorisable), ou vérifier la robustesse d'un mot de passe existant.
+- 🎣 **Détecteur de phishing** (`/detecteur_phishing`) : coller un email/SMS suspect (ou juste un lien) pour repérer les signaux classiques d'arnaque (lien vers une IP, marque imitée, urgence, demande d'infos sensibles...).
 
 ## Structure du projet
 
